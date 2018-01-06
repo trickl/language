@@ -75,18 +75,18 @@ public class EnglishNumberParser {
       Parsers.or(Scanners.WHITESPACES, Scanners.stringCaseInsensitive("and"), Scanners.isChar(','))
           .skipMany();
 
-  private static final Parser<Long> ZERO = keywordsEquals(NumberLiteral.ZERO);
+  private static final Parser<Long> ZERO = numberEquals(NumberLiteral.ZERO);
   private static final Parser<Long> ONE_TO_9 =
-      keywordBetween(NumberLiteral.ONE, NumberLiteral.NINE);
+      numberBetween(NumberLiteral.ONE, NumberLiteral.NINE);
   private static final Parser<Long> TEN_TO_19 =
-      keywordBetween(NumberLiteral.TEN, NumberLiteral.NINETEEN);
+      numberBetween(NumberLiteral.TEN, NumberLiteral.NINETEEN);
   private static final Parser<Long> TENS =
-      keywordBetween(NumberLiteral.TWENTY, NumberLiteral.NINETY);
-  private static final Parser<Long> HUNDRED = keywordsEquals(NumberLiteral.HUNDRED);
-  private static final Parser<Long> THOUSAND = keywordsEquals(NumberLiteral.THOUSAND);
-  private static final Parser<Long> MILLION = keywordsEquals(NumberLiteral.MILLION);
-  private static final Parser<Long> BILLION = keywordsEquals(NumberLiteral.BILLION);
-  private static final Parser<Long> TRILLION = keywordsEquals(NumberLiteral.TRILLION);
+      numberBetween(NumberLiteral.TWENTY, NumberLiteral.NINETY);
+  private static final Parser<Long> HUNDRED = numberEquals(NumberLiteral.HUNDRED);
+  private static final Parser<Long> THOUSAND = numberEquals(NumberLiteral.THOUSAND);
+  private static final Parser<Long> MILLION = numberEquals(NumberLiteral.MILLION);
+  private static final Parser<Long> BILLION = numberEquals(NumberLiteral.BILLION);
+  private static final Parser<Long> TRILLION = numberEquals(NumberLiteral.TRILLION);
 
   private static final Parser<Long> HUNDREDS =
       Parsers.sequence(ONE_TO_9.optional(1L), HUNDRED, (a, b) -> a * b);
@@ -127,11 +127,11 @@ public class EnglishNumberParser {
     return Enum.valueOf(NumberLiteral.class, value).getValue();
   }
 
-  private static Parser<Long> keywordsEquals(NumberLiteral value) {
-    return keywordBetween(value, value);
+  private static Parser<Long> numberEquals(NumberLiteral value) {
+    return numberBetween(value, value);
   }
 
-  private static Parser<Long> keywordBetween(NumberLiteral minValue, NumberLiteral maxValue) {
+  private static Parser<Long> numberBetween(NumberLiteral minValue, NumberLiteral maxValue) {
     String[] keywords =
         EnumSet.allOf(NumberLiteral.class)
             .stream()
@@ -139,7 +139,9 @@ public class EnglishNumberParser {
             .map(e -> e.toString())
             .toArray(String[]::new);
 
-    return KEYWORDS.token(keywords).map(EnglishNumberParser::parseNumberLiteral);
+    return Parsers.or(
+        KEYWORDS.token(keywords).map(EnglishNumberParser::parseNumberLiteral),
+        Terminals.IntegerLiteral.PARSER.map(Long::parseLong));
   }
 
   public long parse(String number) {
