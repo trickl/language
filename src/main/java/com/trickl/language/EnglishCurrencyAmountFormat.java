@@ -85,13 +85,15 @@ public class EnglishCurrencyAmountFormat {
                           new AbstractMap.SimpleEntry<>(
                               parseCurrencySymbol(symbol), cn.getValue()));
 
-  private final Parser<Map.Entry<Currency, Long>> currencySymbolNumber =
-      new OperatorTable<Map.Entry<Currency, Long>>()
-          .prefix(CURRENCY_SYMBOL, 10)
-          .build(
-              EnglishNumberParser.ALL_NUMBERS
-                  .apply(KEYWORDS)
-                  .map(amount -> new AbstractMap.SimpleEntry<>(defaultCurrency, amount)));
+  private static final Function<Currency, Parser<Map.Entry<Currency, Long>>>
+      CURRENCY_SYMBOL_NUMBER =
+          defaultCurrency ->
+              new OperatorTable<Map.Entry<Currency, Long>>()
+                  .prefix(CURRENCY_SYMBOL, 10)
+                  .build(
+                      EnglishNumberParser.ALL_NUMBERS
+                          .apply(KEYWORDS)
+                          .map(amount -> new AbstractMap.SimpleEntry<>(defaultCurrency, amount)));
 
   private static final Parser<Map.Entry<Currency, Long>> NUMBER_CURRENCY_NAME =
       Parsers.sequence(
@@ -99,8 +101,9 @@ public class EnglishCurrencyAmountFormat {
           CURRENCY_NAMES,
           (n, c) -> new AbstractMap.SimpleEntry<>(c, n));
 
-  public final Parser<Map.Entry<Currency, Long>> currencyAmount =
-      Parsers.longest(currencySymbolNumber, NUMBER_CURRENCY_NAME);
+  private static final Function<Currency, Parser<Map.Entry<Currency, Long>>> CURRENCY_AMOUNT =
+      defaultCurrency ->
+          Parsers.longest(CURRENCY_SYMBOL_NUMBER.apply(defaultCurrency), NUMBER_CURRENCY_NAME);
 
   private static Currency parseCurrencySymbol(Token token) {
     String symbol = token.toString();
@@ -134,16 +137,9 @@ public class EnglishCurrencyAmountFormat {
    * @return The currency and amount
    */
   public Map.Entry<Currency, Long> parse(String text) {
-    return currencyAmount.from(TOKENIZER, EnglishNumberParser.IGNORED).parse(text);
-  }
-
-  /**
-   * Convert a string into a currency and amount.
-   *
-   * @param text The string to parse
-   * @return The currency and amount
-   */
-  public Map.Entry<Currency, Long> parseNumberCurrencyName(String text) {
-    return NUMBER_CURRENCY_NAME.from(TOKENIZER, EnglishNumberParser.IGNORED).parse(text);
+    return CURRENCY_AMOUNT
+        .apply(defaultCurrency)
+        .from(TOKENIZER, EnglishNumberParser.IGNORED)
+        .parse(text);
   }
 }
