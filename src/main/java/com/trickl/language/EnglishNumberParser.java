@@ -1,5 +1,6 @@
 package com.trickl.language;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -148,6 +149,21 @@ public class EnglishNumberParser {
               ONE_TO_999.apply(keywords).optional(0L),
               (a, b, c, d, e) -> a + b + c + d + e);
 
+  private static final Function<Terminals, Parser<Long>> DELIMITED_LONG =
+      keywords ->
+          Parsers.sequence(
+              Terminals.IntegerLiteral.PARSER.map(Long::parseLong),
+              Terminals.IntegerLiteral.PARSER.map(Long::parseLong).asOptional(),
+              Terminals.IntegerLiteral.PARSER.map(Long::parseLong).asOptional(),
+              Terminals.IntegerLiteral.PARSER.map(Long::parseLong).asOptional(),
+              Terminals.IntegerLiteral.PARSER.map(Long::parseLong).asOptional(),
+              (a, b, c, d, e) ->
+                  Arrays.asList(b, c, d, e)
+                      .stream()
+                      .filter(val -> val.isPresent())
+                      .map(val -> val.get())
+                      .reduce(a, (total, val) -> total * 1000 + val));
+
   static final Function<Terminals, Parser<Long>> ALL_NUMBERS =
       keywords -> Parsers.longest(ALL_POS_NUMBERS.apply(keywords), ZERO.apply(keywords));
 
@@ -171,7 +187,7 @@ public class EnglishNumberParser {
 
     return Parsers.or(
         keywords.token(restrictedKeywords).map(EnglishNumberParser::parseNumberLiteral),
-        Terminals.IntegerLiteral.PARSER.map(Long::parseLong));
+        DELIMITED_LONG.apply(keywords));
   }
 
   public long parse(String number) {

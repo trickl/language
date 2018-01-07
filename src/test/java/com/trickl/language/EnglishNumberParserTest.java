@@ -55,4 +55,11 @@ public class EnglishNumberParserTest {
     Assert.assertEquals(
         23000397, new EnglishNumberParser().parse("23 million, three hundred and 97"));
   }
+
+  @Test
+  public void testParseCommaDelimitedText() throws ParseException {
+    Assert.assertEquals(1200, new EnglishNumberParser().parse("1,200"));
+    Assert.assertEquals(13000001, new EnglishNumberParser().parse("13,000,001"));
+    Assert.assertEquals(123456789, new EnglishNumberParser().parse("123,456,789"));
+  }
 }
