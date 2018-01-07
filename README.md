@@ -38,18 +38,18 @@ See the Junit tests for usage
 
 ### Duration Parsing
 
-"1 day 3 hours 17 minutes 10 seconds" -> java.time.Duration
-"7 seconds 320 millis" -> java.time.Duration
+* "1 day 3 hours 17 minutes 10 seconds" -> java.time.Duration
+* "7 seconds 320 millis" -> java.time.Duration
 
 ### Number Parsing
 
-"two hundred sixty four" -> 264
-"23 million, three hundred and 97" -> 23000397
+* "two hundred sixty four" -> 264
+* "23 million, three hundred and 97" -> 23000397
 
 ### Currency Amount Parsing
 
-"$13 million" -> (USD, 13000000)
-"one hundred british pound sterling" -> (GBP, 100)
+* "$13 million" -> (USD, 13000000)
+* "one hundred british pound sterling" -> (GBP, 100)
 
 ## Authors
 
