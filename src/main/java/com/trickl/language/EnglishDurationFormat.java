@@ -40,9 +40,9 @@ public final class EnglishDurationFormat {
   }
 
   /**
-   * Format a duration as an English string in the form
-   * [unit_quantity unit]+
-   * e.g. 1 day 2 hours 15 minutes.
+   * Format a duration as an English string in the form [unit_quantity unit]+ e.g. 1 day 2 hours 15
+   * minutes.
+   *
    * @param duration The duration to convert
    * @return English representation
    */
@@ -88,6 +88,7 @@ public final class EnglishDurationFormat {
 
   /**
    * Convert an English text string into a duration.
+   *
    * @param text The text to parse, same format as .format
    * @return A duration object
    * @throws ParseException If text cannot be parsed

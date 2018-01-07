@@ -23,33 +23,36 @@ public class EnglishNumberParserTest {
     Assert.assertEquals(
         99387, new EnglishNumberParser().parse("ninety nine thousand three hundred eighty seven"));
   }
-  
+
   @Test
   public void testParseNumbersWithCommas() throws ParseException {
     Assert.assertEquals(45055, new EnglishNumberParser().parse("forty five thousand, fifty five"));
     Assert.assertEquals(
         99387, new EnglishNumberParser().parse("ninety nine thousand three hundred, eighty seven"));
   }
-  
+
   @Test
   public void testParseNumbersWithAnd() throws ParseException {
-    Assert.assertEquals(45055, new EnglishNumberParser().parse("forty five thousand and fifty five"));
     Assert.assertEquals(
-        99387, new EnglishNumberParser().parse("ninety nine thousand three hundred and eighty seven"));
+        45055, new EnglishNumberParser().parse("forty five thousand and fifty five"));
+    Assert.assertEquals(
+        99387,
+        new EnglishNumberParser().parse("ninety nine thousand three hundred and eighty seven"));
   }
-  
+
   @Test
   public void testParseCaseInsensitvity() throws ParseException {
     Assert.assertEquals(100, new EnglishNumberParser().parse("Hundred"));
     Assert.assertEquals(100, new EnglishNumberParser().parse("ONE HUNDRED"));
     Assert.assertEquals(264, new EnglishNumberParser().parse("Two hundred sixty four"));
   }
-  
+
   @Test
   public void testParseMixNumbersText() throws ParseException {
     Assert.assertEquals(200, new EnglishNumberParser().parse("2 hundred"));
     Assert.assertEquals(13000000, new EnglishNumberParser().parse("13 million"));
     Assert.assertEquals(13000012, new EnglishNumberParser().parse("13 million and 12"));
-    Assert.assertEquals(23000397, new EnglishNumberParser().parse("23 million, three hundred and 97"));
+    Assert.assertEquals(
+        23000397, new EnglishNumberParser().parse("23 million, three hundred and 97"));
   }
 }
