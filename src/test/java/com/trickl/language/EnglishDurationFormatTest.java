@@ -57,6 +57,11 @@ public class EnglishDurationFormatTest {
     Assert.assertEquals(
         Duration.ofSeconds(7).plus(Duration.ofMillis(320)),
         new EnglishDurationFormat().parse("7s 320ms"));
+    
+    // Trailing text
+    Assert.assertEquals(
+        Duration.ofMinutes(85),
+        new EnglishDurationFormat().parse("85 mins."));
   }
 
   @Test

@@ -129,7 +129,7 @@ public final class EnglishDurationFormat {
         long amount = Long.parseLong(matcher.group(2));
         duration = duration.plus(amount, unit);
       } else {
-        duration = null;
+        value = "";
       }
     }
 
