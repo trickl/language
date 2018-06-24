@@ -21,7 +21,10 @@ public class EnglishCurrencyAmountFormatTest {
         new EnglishCurrencyAmountFormat().parse("£23"));
     Assert.assertEquals(
         new AbstractMap.SimpleEntry<>(Currency.getInstance("GBP"), 13000000L),
-        new EnglishCurrencyAmountFormat().parse("£13 million"));    
+        new EnglishCurrencyAmountFormat().parse("£13 million"));   
+    Assert.assertEquals(
+        new AbstractMap.SimpleEntry<>(Currency.getInstance("USD"), 110000000L),
+        new EnglishCurrencyAmountFormat().parse("$110\u00a0million"));       
     Assert.assertEquals(
         new AbstractMap.SimpleEntry<>(Currency.getInstance("EUR"), 13000000L),
         new EnglishCurrencyAmountFormat().parse("13 million euro"));
