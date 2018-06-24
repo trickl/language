@@ -75,7 +75,11 @@ public class EnglishNumberParser {
       Parsers.or(OPERATORS.tokenizer(), KEYWORDS.tokenizer(), Terminals.IntegerLiteral.TOKENIZER);
 
   static final Parser<Void> IGNORED =
-      Parsers.or(Scanners.WHITESPACES, Scanners.stringCaseInsensitive("and"), Scanners.isChar(','), Scanners.isChar('\u00a0'))
+      Parsers.or(
+          Scanners.WHITESPACES,
+          Scanners.stringCaseInsensitive("and"),
+          Scanners.isChar(','), 
+          Scanners.isChar('\u00a0'))
           .skipMany();
 
   private static final Function<Terminals, Parser<Long>> ZERO =
