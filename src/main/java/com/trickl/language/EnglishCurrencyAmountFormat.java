@@ -42,9 +42,12 @@ public class EnglishCurrencyAmountFormat {
           .collect(Collectors.toSet());
 
   private static final Set<String> CURRENCY_SYMBOLS =
-      LOCALES_ISO_3166
-          .stream()
-          .map(locale -> Currency.getInstance(locale).getSymbol(locale))
+      Stream.concat(
+          LOCALES_ISO_3166
+              .stream()
+              .map(locale -> Currency.getInstance(locale).getSymbol(locale)),
+          Arrays.stream(AltCurrencySymbol.values())              
+              .map(acs -> acs.getSymbol()))
           .collect(Collectors.toSet());
 
   private static final Terminals OPERATORS = Terminals.operators(CURRENCY_SYMBOLS);
@@ -107,10 +110,13 @@ public class EnglishCurrencyAmountFormat {
 
   private static Currency parseCurrencySymbol(Token token) {
     String symbol = token.toString();
-    return LOCALES_ISO_3166
+    return Stream.concat(LOCALES_ISO_3166
         .stream()
         .filter(locale -> Currency.getInstance(locale).getSymbol(locale).equals(symbol))
-        .map(locale -> Currency.getInstance(locale))
+        .map(locale -> Currency.getInstance(locale)),
+            Arrays.stream(AltCurrencySymbol.values())              
+              .filter(acs -> acs.getSymbol().equals(symbol))
+              .map(acs -> Currency.getInstance(acs.getCode())))
         .findFirst()
         .get();
   }
