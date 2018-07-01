@@ -13,18 +13,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.Value;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
 @Log
-@Value
+@RequiredArgsConstructor
 public final class EnglishDurationFormat {
 
-  private final ChronoUnit accuracy = ChronoUnit.MILLIS;
+  private final ChronoUnit accuracy;
 
-  private final boolean showZeroes = false;
+  private final boolean showZeroes;
 
-  private static final Map<String, ChronoUnit> aliases;
+  private static final Map<String, ChronoUnit> UNIT_ALIASES;
+  
+  public EnglishDurationFormat() {
+    this(ChronoUnit.MILLIS);
+  }
+  
+  public EnglishDurationFormat(ChronoUnit accuracy) {
+    this(ChronoUnit.MILLIS, false);  
+  }
 
   static {
     Map<String, ChronoUnit> m = new HashMap<>();
@@ -36,7 +44,7 @@ public final class EnglishDurationFormat {
     m.put("microseconds", ChronoUnit.MICROS);
     m.put("ns", ChronoUnit.NANOS);
     m.put("nanoseconds", ChronoUnit.NANOS);
-    aliases = Collections.unmodifiableMap(m);
+    UNIT_ALIASES = Collections.unmodifiableMap(m);
   }
 
   /**
@@ -47,7 +55,7 @@ public final class EnglishDurationFormat {
    * @return English representation
    */
   public String format(Duration duration) {
-
+    
     // Order all the temporal unit
     List<ChronoUnit> sortedUnits = new ArrayList<>(EnumSet.allOf(ChronoUnit.class));
     sortedUnits.remove(ChronoUnit.FOREVER);
@@ -116,8 +124,8 @@ public final class EnglishDurationFormat {
         }
 
         ChronoUnit unit;
-        if (aliases.containsKey(unitName)) {
-          unit = aliases.get(unitName);
+        if (UNIT_ALIASES.containsKey(unitName)) {
+          unit = UNIT_ALIASES.get(unitName);
         } else {
           unit = Enum.valueOf(ChronoUnit.class, unitName.toUpperCase());
         }
