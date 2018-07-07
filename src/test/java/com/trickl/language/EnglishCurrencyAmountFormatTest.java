@@ -37,7 +37,7 @@ public class EnglishCurrencyAmountFormatTest {
   private void assertParsesCurrencyAmount(
       String value,
       String expectedCurrencyCode,
-      long expectedAmount) {
+      long expectedAmount) throws ParseException {
     Map.Entry<Currency, BigDecimal> parsed = new EnglishCurrencyAmountFormat().parse(value);
     Map.Entry<Currency, Long> rounded = 
         new AbstractMap.SimpleEntry<>(parsed.getKey(), parsed.getValue().longValue());

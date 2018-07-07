@@ -1,6 +1,7 @@
 package com.trickl.language;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Currency;
@@ -19,6 +20,7 @@ import org.jparsec.Parsers;
 import org.jparsec.Scanners;
 import org.jparsec.Terminals;
 import org.jparsec.Token;
+import org.jparsec.error.ParserException;
 
 @Value
 public class EnglishCurrencyAmountFormat {
@@ -144,11 +146,17 @@ public class EnglishCurrencyAmountFormat {
    *
    * @param text The string to parse
    * @return The currency and amount
+   * @throws ParseException if unable to parse the string
    */
-  public Map.Entry<Currency, BigDecimal> parse(String text) {
-    return CURRENCY_AMOUNT
-        .apply(defaultCurrency)
-        .from(TOKENIZER, EnglishNumberParser.IGNORED)
-        .parse(text);
+  public Map.Entry<Currency, BigDecimal> parse(String text) 
+      throws ParseException {
+    try {
+      return CURRENCY_AMOUNT
+          .apply(defaultCurrency)
+          .from(TOKENIZER, EnglishNumberParser.IGNORED)
+          .parse(text);
+    } catch (ParserException ex) {
+      throw new ParseException(ex.getMessage(), ex.getLocation().column);
+    }
   }
 }
