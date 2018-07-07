@@ -10,56 +10,67 @@ public class EnglishNumberParserTest {
   @Test
   public void testParseNumbersOnly() throws ParseException {
     // Numbers all lowercase
-    Assert.assertEquals(0, new EnglishNumberParser().parse("zero"));
-    Assert.assertEquals(3, new EnglishNumberParser().parse("three"));
-    Assert.assertEquals(14, new EnglishNumberParser().parse("fourteen"));
-    Assert.assertEquals(35, new EnglishNumberParser().parse("thirty five"));
-    Assert.assertEquals(70, new EnglishNumberParser().parse("seventy"));
-    Assert.assertEquals(100, new EnglishNumberParser().parse("hundred"));
-    Assert.assertEquals(100, new EnglishNumberParser().parse("one hundred"));
-    Assert.assertEquals(264, new EnglishNumberParser().parse("two hundred sixty four"));
-    Assert.assertEquals(13000, new EnglishNumberParser().parse("thirteen thousand"));
-    Assert.assertEquals(45055, new EnglishNumberParser().parse("forty five thousand fifty five"));
-    Assert.assertEquals(
-        99387, new EnglishNumberParser().parse("ninety nine thousand three hundred eighty seven"));
+    assertParsesLong(0, "zero");
+    assertParsesLong(3, "three");
+    assertParsesLong(14, "fourteen");
+    assertParsesLong(35, "thirty five");
+    assertParsesLong(70, "seventy");
+    assertParsesLong(100, "hundred");
+    assertParsesLong(100, "one hundred");
+    assertParsesLong(264, "two hundred sixty four");
+    assertParsesLong(13000, "thirteen thousand");
+    assertParsesLong(45055, "forty five thousand fifty five");
+    assertParsesLong(99387, "ninety nine thousand three hundred eighty seven");
   }
 
   @Test
   public void testParseNumbersWithCommas() throws ParseException {
-    Assert.assertEquals(45055, new EnglishNumberParser().parse("forty five thousand, fifty five"));
-    Assert.assertEquals(
-        99387, new EnglishNumberParser().parse("ninety nine thousand three hundred, eighty seven"));
+    assertParsesLong(45055, "forty five thousand, fifty five");
+    assertParsesLong(99387, "ninety nine thousand three hundred, eighty seven");
   }
 
   @Test
   public void testParseNumbersWithAnd() throws ParseException {
-    Assert.assertEquals(
-        45055, new EnglishNumberParser().parse("forty five thousand and fifty five"));
-    Assert.assertEquals(
-        99387,
-        new EnglishNumberParser().parse("ninety nine thousand three hundred and eighty seven"));
+    assertParsesLong(45055, "forty five thousand and fifty five");
+    assertParsesLong(99387, "ninety nine thousand three hundred and eighty seven");
   }
 
   @Test
   public void testParseCaseInsensitvity() throws ParseException {
-    Assert.assertEquals(100, new EnglishNumberParser().parse("Hundred"));
-    Assert.assertEquals(100, new EnglishNumberParser().parse("ONE HUNDRED"));
-    Assert.assertEquals(264, new EnglishNumberParser().parse("Two hundred sixty four"));
+    assertParsesLong(100, "Hundred");
+    assertParsesLong(100, "ONE HUNDRED");
+    assertParsesLong(264, "Two hundred sixty four");
   }
 
   @Test
   public void testParseMixNumbersText() throws ParseException {
-    Assert.assertEquals(200, new EnglishNumberParser().parse("2 hundred"));
-    Assert.assertEquals(13000000, new EnglishNumberParser().parse("13 million"));
-    Assert.assertEquals(13000012, new EnglishNumberParser().parse("13 million and 12"));
-    Assert.assertEquals(
-        23000397, new EnglishNumberParser().parse("23 million, three hundred and 97"));
+    assertParsesLong(200, "2 hundred");
+    assertParsesLong(13000000, "13 million");
+    assertParsesLong(13000012, "13 million and 12");
+    assertParsesLong(23000397, "23 million, three hundred and 97");
   }
 
   @Test
   public void testParseCommaDelimitedText() throws ParseException {
-    Assert.assertEquals(1200, new EnglishNumberParser().parse("1,200"));
-    Assert.assertEquals(13000001, new EnglishNumberParser().parse("13,000,001"));
-    Assert.assertEquals(123456789, new EnglishNumberParser().parse("123,456,789"));
+    assertParsesLong(1200, "1,200");
+    assertParsesLong(13000001, "13,000,001");
+    assertParsesLong(123456789, "123,456,789");
+    assertParsesLong(123456789, "123،456،789");
+  }
+  
+  @Test
+  public void testParseDecimals() throws ParseException {
+    assertParsesDouble(0.7, "0.7", 1e-5);
+    assertParsesDouble(0.34, ".34", 1e-5);
+  }
+  
+  private void assertParsesLong(long expected, String text) {
+    Assert.assertEquals(expected, new EnglishNumberParser()
+        .parse(text).longValueExact());
+  }
+  
+  private void assertParsesDouble(double expected, String text, double tolerance) {
+    Assert.assertEquals(expected, new EnglishNumberParser()
+        .parse(text).floatValue(), tolerance);
   }
 }

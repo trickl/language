@@ -1,5 +1,6 @@
 package com.trickl.language;
 
+import java.math.BigDecimal;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Currency;
@@ -43,11 +44,10 @@ public class EnglishCurrencyAmountFormat {
 
   private static final Set<String> CURRENCY_SYMBOLS =
       Stream.concat(
-          LOCALES_ISO_3166
-              .stream()
-              .map(locale -> Currency.getInstance(locale).getSymbol(locale)),
-          Arrays.stream(AltCurrencySymbol.values())              
-              .map(acs -> acs.getSymbol()))
+              LOCALES_ISO_3166
+                  .stream()
+                  .map(locale -> Currency.getInstance(locale).getSymbol(locale)),
+              Arrays.stream(AltCurrencySymbol.values()).map(acs -> acs.getSymbol()))
           .collect(Collectors.toSet());
 
   private static final Terminals OPERATORS = Terminals.operators(CURRENCY_SYMBOLS);
@@ -62,7 +62,7 @@ public class EnglishCurrencyAmountFormat {
           .build();
 
   private static final Parser<?> TOKENIZER =
-      Parsers.or(OPERATORS.tokenizer(), KEYWORDS.tokenizer(), Terminals.IntegerLiteral.TOKENIZER);
+      Parsers.or(OPERATORS.tokenizer(), KEYWORDS.tokenizer(), Terminals.DecimalLiteral.TOKENIZER);
 
   private static final Parser<Currency> CURRENCY_NAMES =
       Parsers.or(
@@ -78,7 +78,8 @@ public class EnglishCurrencyAmountFormat {
                           .map(EnglishCurrencyAmountFormat::parseCurrencyDisplayName))
               .collect(Collectors.toList()));
 
-  private static final Parser<Function<Map.Entry<Currency, Long>, Map.Entry<Currency, Long>>>
+  private static final Parser<
+          Function<Map.Entry<Currency, BigDecimal>, Map.Entry<Currency, BigDecimal>>>
       CURRENCY_SYMBOL =
           OPERATORS
               .token(CURRENCY_SYMBOLS.toArray(new String[0]))
@@ -88,35 +89,37 @@ public class EnglishCurrencyAmountFormat {
                           new AbstractMap.SimpleEntry<>(
                               parseCurrencySymbol(symbol), cn.getValue()));
 
-  private static final Function<Currency, Parser<Map.Entry<Currency, Long>>>
+  private static final Function<Currency, Parser<Map.Entry<Currency, BigDecimal>>>
       CURRENCY_SYMBOL_NUMBER =
           defaultCurrency ->
-              new OperatorTable<Map.Entry<Currency, Long>>()
-                  .prefix(CURRENCY_SYMBOL, 10)
+              new OperatorTable<Map.Entry<Currency, BigDecimal>>()
+                  .prefix(CURRENCY_SYMBOL, 10) 
                   .build(
                       EnglishNumberParser.ALL_NUMBERS
                           .apply(KEYWORDS)
                           .map(amount -> new AbstractMap.SimpleEntry<>(defaultCurrency, amount)));
 
-  private static final Parser<Map.Entry<Currency, Long>> NUMBER_CURRENCY_NAME =
+  private static final Parser<Map.Entry<Currency, BigDecimal>> NUMBER_CURRENCY_NAME =
       Parsers.sequence(
-          EnglishNumberParser.ALL_NUMBERS.apply(KEYWORDS),
+          EnglishNumberParser.ALL_NUMBERS
+              .apply(KEYWORDS),              
           CURRENCY_NAMES,
           (n, c) -> new AbstractMap.SimpleEntry<>(c, n));
 
-  private static final Function<Currency, Parser<Map.Entry<Currency, Long>>> CURRENCY_AMOUNT =
+  private static final Function<Currency, Parser<Map.Entry<Currency, BigDecimal>>> CURRENCY_AMOUNT =
       defaultCurrency ->
           Parsers.longest(CURRENCY_SYMBOL_NUMBER.apply(defaultCurrency), NUMBER_CURRENCY_NAME);
 
   private static Currency parseCurrencySymbol(Token token) {
     String symbol = token.toString();
-    return Stream.concat(LOCALES_ISO_3166
-        .stream()
-        .filter(locale -> Currency.getInstance(locale).getSymbol(locale).equals(symbol))
-        .map(locale -> Currency.getInstance(locale)),
-            Arrays.stream(AltCurrencySymbol.values())              
-              .filter(acs -> acs.getSymbol().equals(symbol))
-              .map(acs -> Currency.getInstance(acs.getCode())))
+    return Stream.concat(
+            LOCALES_ISO_3166
+                .stream()
+                .filter(locale -> Currency.getInstance(locale).getSymbol(locale).equals(symbol))
+                .map(locale -> Currency.getInstance(locale)),
+            Arrays.stream(AltCurrencySymbol.values())
+                .filter(acs -> acs.getSymbol().equals(symbol))
+                .map(acs -> Currency.getInstance(acs.getCode())))
         .findFirst()
         .get();
   }
@@ -142,7 +145,7 @@ public class EnglishCurrencyAmountFormat {
    * @param text The string to parse
    * @return The currency and amount
    */
-  public Map.Entry<Currency, Long> parse(String text) {
+  public Map.Entry<Currency, BigDecimal> parse(String text) {
     return CURRENCY_AMOUNT
         .apply(defaultCurrency)
         .from(TOKENIZER, EnglishNumberParser.IGNORED)

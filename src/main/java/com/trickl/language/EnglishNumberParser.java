@@ -1,5 +1,6 @@
 package com.trickl.language;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -60,6 +61,8 @@ public class EnglishNumberParser {
     private final long value;
   }
 
+  private static final BigDecimal BIG_DECIMAL_THOUSAND = new BigDecimal(1000);
+
   private static final Terminals OPERATORS = Terminals.operators(Collections.EMPTY_LIST);
 
   static final Set<String> NUMBER_LITERALS =
@@ -72,103 +75,116 @@ public class EnglishNumberParser {
       OPERATORS.words(Scanners.IDENTIFIER).caseInsensitiveKeywords(NUMBER_LITERALS).build();
 
   private static final Parser<?> TOKENIZER =
-      Parsers.or(OPERATORS.tokenizer(), KEYWORDS.tokenizer(), Terminals.IntegerLiteral.TOKENIZER);
+      Parsers.or(OPERATORS.tokenizer(), KEYWORDS.tokenizer(), Terminals.DecimalLiteral.TOKENIZER);
 
   static final Parser<Void> IGNORED =
       Parsers.or(
-          Scanners.WHITESPACES,
-          Scanners.stringCaseInsensitive("and"),
-          Scanners.isChar(','), 
-          Scanners.isChar('\u00a0'))
+              Scanners.WHITESPACES,
+              Scanners.stringCaseInsensitive("and"),
+              Scanners.isChar(','),
+              Scanners.isChar('،'), // Arabic Comma
+              Scanners.isChar('\u00a0'))
           .skipMany();
 
-  private static final Function<Terminals, Parser<Long>> ZERO =
+  private static final Function<Terminals, Parser<BigDecimal>> ZERO =
       keywords -> numberEquals(keywords, NumberLiteral.ZERO);
-  private static final Function<Terminals, Parser<Long>> ONE_TO_9 =
+  private static final Function<Terminals, Parser<BigDecimal>> ONE_TO_9 =
       keywords -> numberBetween(keywords, NumberLiteral.ONE, NumberLiteral.NINE);
-  private static final Function<Terminals, Parser<Long>> TEN_TO_19 =
+  private static final Function<Terminals, Parser<BigDecimal>> TEN_TO_19 =
       keywords -> numberBetween(keywords, NumberLiteral.TEN, NumberLiteral.NINETEEN);
-  private static final Function<Terminals, Parser<Long>> TENS =
+  private static final Function<Terminals, Parser<BigDecimal>> TENS =
       keywords -> numberBetween(keywords, NumberLiteral.TWENTY, NumberLiteral.NINETY);
-  private static final Function<Terminals, Parser<Long>> HUNDRED =
+  private static final Function<Terminals, Parser<BigDecimal>> HUNDRED =
       keywords -> numberEquals(keywords, NumberLiteral.HUNDRED);
-  private static final Function<Terminals, Parser<Long>> THOUSAND =
+  private static final Function<Terminals, Parser<BigDecimal>> THOUSAND =
       keywords -> numberEquals(keywords, NumberLiteral.THOUSAND);
-  private static final Function<Terminals, Parser<Long>> MILLION =
+  private static final Function<Terminals, Parser<BigDecimal>> MILLION =
       keywords -> numberEquals(keywords, NumberLiteral.MILLION);
-  private static final Function<Terminals, Parser<Long>> BILLION =
+  private static final Function<Terminals, Parser<BigDecimal>> BILLION =
       keywords -> numberEquals(keywords, NumberLiteral.BILLION);
-  private static final Function<Terminals, Parser<Long>> TRILLION =
+  private static final Function<Terminals, Parser<BigDecimal>> TRILLION =
       keywords -> numberEquals(keywords, NumberLiteral.TRILLION);
 
-  private static final Function<Terminals, Parser<Long>> HUNDREDS =
+  private static final Function<Terminals, Parser<BigDecimal>> HUNDREDS =
       keywords ->
           Parsers.sequence(
-              ONE_TO_9.apply(keywords).optional(1L), HUNDRED.apply(keywords), (a, b) -> a * b);
+              ONE_TO_9.apply(keywords).optional(BigDecimal.ONE),
+              HUNDRED.apply(keywords),
+              (a, b) -> a.multiply(b));
 
-  private static final Function<Terminals, Parser<Long>> TWENTY_TO_99 =
+  private static final Function<Terminals, Parser<BigDecimal>> TWENTY_TO_99 =
       keywords ->
           Parsers.sequence(
-              TENS.apply(keywords), ONE_TO_9.apply(keywords).optional(0L), (a, b) -> a + b);
+              TENS.apply(keywords),
+              ONE_TO_9.apply(keywords).optional(BigDecimal.ZERO),
+              (a, b) -> a.add(b));
 
-  private static final Function<Terminals, Parser<Long>> ONE_TO_99 =
+  private static final Function<Terminals, Parser<BigDecimal>> ONE_TO_99 =
       keywords ->
           Parsers.or(
               ONE_TO_9.apply(keywords), TEN_TO_19.apply(keywords), TWENTY_TO_99.apply(keywords));
 
-  private static final Function<Terminals, Parser<Long>> ONE_TO_999 =
+  private static final Function<Terminals, Parser<BigDecimal>> ONE_TO_999 =
       keywords ->
           Parsers.sequence(
-              HUNDREDS.apply(keywords).optional(0L),
-              ONE_TO_99.apply(keywords).optional(0L),
-              (a, b) -> a + b);
+              HUNDREDS.apply(keywords).optional(BigDecimal.ZERO),
+              ONE_TO_99.apply(keywords).optional(BigDecimal.ZERO),
+              (a, b) -> a.add(b));
 
-  private static final Function<Terminals, Parser<Long>> THOUSANDS =
+  private static final Function<Terminals, Parser<BigDecimal>> THOUSANDS =
       keywords ->
           Parsers.sequence(
-              ONE_TO_999.apply(keywords).optional(1L), THOUSAND.apply(keywords), (a, b) -> a * b);
+              ONE_TO_999.apply(keywords).optional(BigDecimal.ONE),
+              THOUSAND.apply(keywords),
+              (a, b) -> a.multiply(b));
 
-  private static final Function<Terminals, Parser<Long>> MILLIONS =
+  private static final Function<Terminals, Parser<BigDecimal>> MILLIONS =
       keywords ->
           Parsers.sequence(
-              ONE_TO_999.apply(keywords).optional(1L), MILLION.apply(keywords), (a, b) -> a * b);
+              ONE_TO_999.apply(keywords).optional(BigDecimal.ONE),
+              MILLION.apply(keywords),
+              (a, b) -> a.multiply(b));
 
-  private static final Function<Terminals, Parser<Long>> BILLIONS =
+  private static final Function<Terminals, Parser<BigDecimal>> BILLIONS =
       keywords ->
           Parsers.sequence(
-              ONE_TO_999.apply(keywords).optional(1L), BILLION.apply(keywords), (a, b) -> a * b);
+              ONE_TO_999.apply(keywords).optional(BigDecimal.ONE),
+              BILLION.apply(keywords),
+              (a, b) -> a.multiply(b));
 
-  private static final Function<Terminals, Parser<Long>> TRILLIONS =
+  private static final Function<Terminals, Parser<BigDecimal>> TRILLIONS =
       keywords ->
           Parsers.sequence(
-              ONE_TO_999.apply(keywords).optional(1L), TRILLION.apply(keywords), (a, b) -> a * b);
+              ONE_TO_999.apply(keywords).optional(BigDecimal.ONE),
+              TRILLION.apply(keywords),
+              (a, b) -> a.multiply(b));
 
-  private static final Function<Terminals, Parser<Long>> ALL_POS_NUMBERS =
+  private static final Function<Terminals, Parser<BigDecimal>> ALL_POS_NUMBERS =
       keywords ->
           Parsers.sequence(
-              TRILLIONS.apply(keywords).optional(0L),
-              BILLIONS.apply(keywords).optional(0L),
-              MILLIONS.apply(keywords).optional(0L),
-              THOUSANDS.apply(keywords).optional(0L),
-              ONE_TO_999.apply(keywords).optional(0L),
-              (a, b, c, d, e) -> a + b + c + d + e);
+              TRILLIONS.apply(keywords).optional(BigDecimal.ZERO),
+              BILLIONS.apply(keywords).optional(BigDecimal.ZERO),
+              MILLIONS.apply(keywords).optional(BigDecimal.ZERO),
+              THOUSANDS.apply(keywords).optional(BigDecimal.ZERO),
+              ONE_TO_999.apply(keywords).optional(BigDecimal.ZERO),
+              (a, b, c, d, e) -> a.add(b).add(c).add(d).add(e));
 
-  private static final Function<Terminals, Parser<Long>> DELIMITED_LONG =
+  private static final Function<Terminals, Parser<BigDecimal>> DELIMITED_NUMERIC =
       keywords ->
           Parsers.sequence(
-              Terminals.IntegerLiteral.PARSER.map(Long::parseLong),
-              Terminals.IntegerLiteral.PARSER.map(Long::parseLong).asOptional(),
-              Terminals.IntegerLiteral.PARSER.map(Long::parseLong).asOptional(),
-              Terminals.IntegerLiteral.PARSER.map(Long::parseLong).asOptional(),
-              Terminals.IntegerLiteral.PARSER.map(Long::parseLong).asOptional(),
+              Terminals.DecimalLiteral.PARSER.map(BigDecimal::new),
+              Terminals.DecimalLiteral.PARSER.map(BigDecimal::new).asOptional(),
+              Terminals.DecimalLiteral.PARSER.map(BigDecimal::new).asOptional(),
+              Terminals.DecimalLiteral.PARSER.map(BigDecimal::new).asOptional(),
+              Terminals.DecimalLiteral.PARSER.map(BigDecimal::new).asOptional(),
               (a, b, c, d, e) ->
                   Arrays.asList(b, c, d, e)
                       .stream()
                       .filter(val -> val.isPresent())
                       .map(val -> val.get())
-                      .reduce(a, (total, val) -> total * 1000 + val));
+                      .reduce(a, (total, val) -> total.multiply(BIG_DECIMAL_THOUSAND).add(val)));
 
-  static final Function<Terminals, Parser<Long>> ALL_NUMBERS =
+  static final Function<Terminals, Parser<BigDecimal>> ALL_NUMBERS =
       keywords -> Parsers.longest(ALL_POS_NUMBERS.apply(keywords), ZERO.apply(keywords));
 
   private static Long parseNumberLiteral(Token token) {
@@ -176,11 +192,11 @@ public class EnglishNumberParser {
     return Enum.valueOf(NumberLiteral.class, value).getValue();
   }
 
-  private static Parser<Long> numberEquals(Terminals keywords, NumberLiteral value) {
+  private static Parser<BigDecimal> numberEquals(Terminals keywords, NumberLiteral value) {
     return numberBetween(keywords, value, value);
   }
 
-  private static Parser<Long> numberBetween(
+  private static Parser<BigDecimal> numberBetween(
       Terminals keywords, NumberLiteral minValue, NumberLiteral maxValue) {
     String[] restrictedKeywords =
         EnumSet.allOf(NumberLiteral.class)
@@ -190,11 +206,14 @@ public class EnglishNumberParser {
             .toArray(String[]::new);
 
     return Parsers.or(
-        keywords.token(restrictedKeywords).map(EnglishNumberParser::parseNumberLiteral),
-        DELIMITED_LONG.apply(keywords));
+        keywords
+            .token(restrictedKeywords)
+            .map(EnglishNumberParser::parseNumberLiteral)
+            .map(val -> new BigDecimal(val)),
+        DELIMITED_NUMERIC.apply(keywords));
   }
 
-  public long parse(String number) {
+  public BigDecimal parse(String number) {
     return ALL_NUMBERS.apply(KEYWORDS).from(TOKENIZER, IGNORED).parse(number);
   }
 }
