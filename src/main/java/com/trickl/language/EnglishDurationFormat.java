@@ -127,7 +127,11 @@ public final class EnglishDurationFormat {
         if (UNIT_ALIASES.containsKey(unitName)) {
           unit = UNIT_ALIASES.get(unitName);
         } else {
-          unit = Enum.valueOf(ChronoUnit.class, unitName.toUpperCase());
+          try {
+            unit = Enum.valueOf(ChronoUnit.class, unitName.toUpperCase());
+          } catch (IllegalArgumentException ex) {
+            throw new ParseException(ex.getMessage(), 0);
+          }
         }
 
         if (duration == null) {
@@ -142,7 +146,7 @@ public final class EnglishDurationFormat {
     }
 
     if (duration == null) {
-      throw new RuntimeException("Unable to parse Duration '" + value + "'");
+      throw new ParseException("Unable to parse Duration '" + value + "'", 0);
     }
 
     return duration;
