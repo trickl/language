@@ -2,7 +2,7 @@
 
 Build: 
 [![build_status](https://travis-ci.com/trickl/language.svg?branch=master)](https://travis-ci.com/trickl/language)
-[![Maintainability](https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability)](https://codeclimate.com/github/codeclimate/codeclimate/maintainability)
+[![Maintainability](https://api.codeclimate.com/v1/badges/be4af1f4cc620e465849/maintainability)](https://codeclimate.com/github/trickl/language/maintainability)
 
 A set of short utility functions for parsing common English language constructs. 
 
