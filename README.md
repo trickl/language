@@ -1,6 +1,6 @@
 # Trickl Language
 
-Build status: [![build_status](https://travis-ci.org/trickl/language.svg?branch=master)](https://travis-ci.org/trickl/language)
+Build status: [![build_status](https://travis-ci.com/trickl/language.svg?branch=master)](https://travis-ci.com/trickl/language)
 
 A set of short utility functions for parsing common English language constructs. 
 
