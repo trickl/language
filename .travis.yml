@@ -1,4 +1,16 @@
 language: java
+ env:
+   global:
+     - CC_TEST_REPORTER_ID=3f1c0d93a3be444be021f93bdb077079ae9acee47374681435d9292821f4fe0c
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+script:
+  - mvn test
+after_script:
+  - ./cc-test-reporter format-coverage -d -t jacoco ./target/jacoco-ut/jacoco.xml
+  - ./cc-test-reporter upload-coverage -d
 before_deploy:
 - mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
 - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep
