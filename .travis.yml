@@ -1,5 +1,5 @@
 language: java
- env:
+env:
    global:
      - CC_TEST_REPORTER_ID=3f1c0d93a3be444be021f93bdb077079ae9acee47374681435d9292821f4fe0c
 before_script:
