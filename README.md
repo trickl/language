@@ -1,8 +1,8 @@
 # Trickl Language
 
-Build: 
 [![build_status](https://travis-ci.com/trickl/language.svg?branch=master)](https://travis-ci.com/trickl/language)
 [![Maintainability](https://api.codeclimate.com/v1/badges/be4af1f4cc620e465849/maintainability)](https://codeclimate.com/github/trickl/language/maintainability)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A set of short utility functions for parsing common English language constructs. 
 
