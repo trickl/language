@@ -8,15 +8,15 @@ A set of short utility functions for parsing common English language constructs.
 
 Specifically - reading numbers, currency amounts and durations as English text and converting into a strongly typed class.
 
-## Getting Started
-
-These instructions will get you a copy of the library 
-
 ### Prerequisites
 
-Requires Git, Maven 3 and a Java 8 compiler installed on your system.
+Requires Maven and a Java 8 compiler installed on your system.
 
-### Downloding and Building
+## Usage
+
+See the Junit tests for usage
+
+### Installing
 
 To download the library into a folder called "language" run
 
@@ -29,14 +29,6 @@ To build the library run
 ```
 mvn clean build
 ```
-
-## Running the tests
-
-The build will automatically run the tests
-
-## Usage
-
-See the Junit tests for usage
 
 ## Examples
 
@@ -54,16 +46,6 @@ See the Junit tests for usage
 
 * "$13 million" -> (USD, 13000000)
 * "one hundred british pound sterling" -> (GBP, 100)
-
-## Authors
-
-* **Tim Gee** - *Initial work* - [Trickl](https://github.com/trickl)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the GNU GPL v3 License - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 
