@@ -104,14 +104,20 @@ public class EnglishNumberParser {
       keywords -> numberEquals(keywords, NumberLiteral.BILLION);
   private static final Function<Terminals, Parser<BigDecimal>> TRILLION =
       keywords -> numberEquals(keywords, NumberLiteral.TRILLION);
+  
+  private static final Function<Terminals, Parser<BigDecimal>> multiplyUnit(
+      Function<Terminals, Parser<BigDecimal>> factor,
+      Function<Terminals, Parser<BigDecimal>> unit) {
+    return keywords ->
+        Parsers.sequence(
+            factor.apply(keywords).optional(BigDecimal.ONE),
+            unit.apply(keywords),
+            (a, b) -> a.multiply(b));      
+  }       
 
   private static final Function<Terminals, Parser<BigDecimal>> HUNDREDS =
-      keywords ->
-          Parsers.sequence(
-              ONE_TO_9.apply(keywords).optional(BigDecimal.ONE),
-              HUNDRED.apply(keywords),
-              (a, b) -> a.multiply(b));
-
+      multiplyUnit(ONE_TO_9, HUNDRED);
+      
   private static final Function<Terminals, Parser<BigDecimal>> TWENTY_TO_99 =
       keywords ->
           Parsers.sequence(
@@ -132,32 +138,16 @@ public class EnglishNumberParser {
               (a, b) -> a.add(b));
 
   private static final Function<Terminals, Parser<BigDecimal>> THOUSANDS =
-      keywords ->
-          Parsers.sequence(
-              ONE_TO_999.apply(keywords).optional(BigDecimal.ONE),
-              THOUSAND.apply(keywords),
-              (a, b) -> a.multiply(b));
+      multiplyUnit(ONE_TO_999, THOUSAND);
 
   private static final Function<Terminals, Parser<BigDecimal>> MILLIONS =
-      keywords ->
-          Parsers.sequence(
-              ONE_TO_999.apply(keywords).optional(BigDecimal.ONE),
-              MILLION.apply(keywords),
-              (a, b) -> a.multiply(b));
+      multiplyUnit(ONE_TO_999, MILLION);
 
   private static final Function<Terminals, Parser<BigDecimal>> BILLIONS =
-      keywords ->
-          Parsers.sequence(
-              ONE_TO_999.apply(keywords).optional(BigDecimal.ONE),
-              BILLION.apply(keywords),
-              (a, b) -> a.multiply(b));
+      multiplyUnit(ONE_TO_999, BILLION);
 
   private static final Function<Terminals, Parser<BigDecimal>> TRILLIONS =
-      keywords ->
-          Parsers.sequence(
-              ONE_TO_999.apply(keywords).optional(BigDecimal.ONE),
-              TRILLION.apply(keywords),
-              (a, b) -> a.multiply(b));
+      multiplyUnit(ONE_TO_999, TRILLION);
 
   private static final Function<Terminals, Parser<BigDecimal>> ALL_POS_NUMBERS =
       keywords ->

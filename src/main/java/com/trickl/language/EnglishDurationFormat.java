@@ -26,6 +26,11 @@ public final class EnglishDurationFormat {
 
   private static final Map<String, ChronoUnit> UNIT_ALIASES;
   
+  private static final List<ChronoUnit> SORTED_UNITS;
+  
+  private static final String FORMAT_PATTERN = 
+      "^((\\p{Space}*(\\p{Digit}+))?\\p{Space}*(\\p{Alpha}+)\\p{Space}*).*";
+  
   public EnglishDurationFormat() {
     this(ChronoUnit.MILLIS);
   }
@@ -45,6 +50,11 @@ public final class EnglishDurationFormat {
     m.put("ns", ChronoUnit.NANOS);
     m.put("nanoseconds", ChronoUnit.NANOS);
     UNIT_ALIASES = Collections.unmodifiableMap(m);
+    
+    SORTED_UNITS = new ArrayList<>(EnumSet.allOf(ChronoUnit.class));
+    SORTED_UNITS.remove(ChronoUnit.FOREVER);
+    SORTED_UNITS.remove(ChronoUnit.ERAS);    
+    Collections.sort(SORTED_UNITS, Comparator.reverseOrder());
   }
 
   /**
@@ -54,17 +64,9 @@ public final class EnglishDurationFormat {
    * @param duration The duration to convert
    * @return English representation
    */
-  public String format(Duration duration) {
-    
-    // Order all the temporal unit
-    List<ChronoUnit> sortedUnits = new ArrayList<>(EnumSet.allOf(ChronoUnit.class));
-    sortedUnits.remove(ChronoUnit.FOREVER);
-    sortedUnits.remove(ChronoUnit.ERAS);
-
-    Collections.sort(sortedUnits, Comparator.reverseOrder());
-
+  public String format(Duration duration) {    
     List<String> formattedParts = new LinkedList<>();
-    for (ChronoUnit unit : sortedUnits) {
+    for (ChronoUnit unit : SORTED_UNITS) {
       if (unit.compareTo(accuracy) == -1) {
         break;
       }
@@ -81,9 +83,7 @@ public final class EnglishDurationFormat {
         String unitName = unit.toString().toLowerCase();
         if (unitSize == 1) {
           // Singularize unit
-          unitName = unitName.replaceAll("ia$", "ium");
-          unitName = unitName.replaceAll("ries$", "ry");
-          unitName = unitName.replaceAll("s$", "");
+          unitName = singularize(unitName);
         }
         String formattedPart = unitSize + " " + unitName;
         formattedParts.add(formattedPart);
@@ -107,7 +107,7 @@ public final class EnglishDurationFormat {
 
     while (!value.isEmpty()) {
       Pattern amountAndUnitPattern =
-          Pattern.compile("^((\\p{Space}*(\\p{Digit}+))?\\p{Space}*(\\p{Alpha}+)\\p{Space}*).*");
+          Pattern.compile(FORMAT_PATTERN);
       Matcher matcher = amountAndUnitPattern.matcher(value);
       if (matcher.matches()) {
         value = value.substring(matcher.group(1).length());
@@ -115,25 +115,10 @@ public final class EnglishDurationFormat {
         unitName = unitName.toLowerCase();
 
         // Pluralize if necessary
-        if (unitName.endsWith("ium")) {
-          unitName = unitName.replaceAll("ium$", "ia");
-        } else if (unitName.endsWith("ry")) {
-          unitName = unitName.replaceAll("ry$", "ries");
-        } else if (!unitName.endsWith("s")) {
-          unitName = unitName + "s";
-        }
+        unitName = pluralize(unitName);
 
-        ChronoUnit unit;
-        if (UNIT_ALIASES.containsKey(unitName)) {
-          unit = UNIT_ALIASES.get(unitName);
-        } else {
-          try {
-            unit = Enum.valueOf(ChronoUnit.class, unitName.toUpperCase());
-          } catch (IllegalArgumentException ex) {
-            throw new ParseException(ex.getMessage(), 0);
-          }
-        }
-
+        ChronoUnit unit = parseChronoUnit(unitName);
+        
         if (duration == null) {
           duration = Duration.ZERO;
         }
@@ -150,5 +135,42 @@ public final class EnglishDurationFormat {
     }
 
     return duration;
+  }
+  
+  private String pluralize(String noun) {
+    if (noun.endsWith("ium")) {
+      return noun.replaceAll("ium$", "ia");
+    } else if (noun.endsWith("ry")) {
+      return noun.replaceAll("ry$", "ries");
+    } else if (!noun.endsWith("s")) {
+      return noun + "s";
+    }
+    return noun;
+  }
+  
+  private String singularize(String noun) {
+    if (noun.endsWith("ia")) {
+      return noun.replaceAll("ia$", "ium");
+    } else if (noun.endsWith("ries")) {
+      return noun.replaceAll("ries$", "ry");
+    } else if (noun.endsWith("s")) {
+      return noun.replaceAll("s$", "");
+    }
+    return noun;
+  }
+  
+  private ChronoUnit parseChronoUnit(String text) throws ParseException {
+    ChronoUnit unit;
+    if (UNIT_ALIASES.containsKey(text)) {
+      unit = UNIT_ALIASES.get(text);
+    } else {
+      try {
+        unit = Enum.valueOf(ChronoUnit.class, text.toUpperCase());
+      } catch (IllegalArgumentException ex) {
+        throw new ParseException(ex.getMessage(), 0);
+      }
+    }
+    
+    return unit;
   }
 }
