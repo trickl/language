@@ -107,11 +107,11 @@ public final class EnglishDurationFormat {
 
     while (!value.isEmpty()) {
       Pattern amountAndUnitPattern =
-          Pattern.compile("^(\\p{Space}*(\\p{Digit}+)\\p{Space}*(\\p{Alpha}+)\\p{Space}*).*");
+          Pattern.compile("^((\\p{Space}*(\\p{Digit}+))?\\p{Space}*(\\p{Alpha}+)\\p{Space}*).*");
       Matcher matcher = amountAndUnitPattern.matcher(value);
       if (matcher.matches()) {
         value = value.substring(matcher.group(1).length());
-        String unitName = matcher.group(3);
+        String unitName = matcher.group(4);
         unitName = unitName.toLowerCase();
 
         // Pluralize if necessary
@@ -137,8 +137,8 @@ public final class EnglishDurationFormat {
         if (duration == null) {
           duration = Duration.ZERO;
         }
-
-        long amount = Long.parseLong(matcher.group(2));
+        
+        long amount = matcher.group(3) == null ? 1 : Long.parseLong(matcher.group(3));
         duration = duration.plus(amount, unit);
       } else {
         value = "";
@@ -146,7 +146,7 @@ public final class EnglishDurationFormat {
     }
 
     if (duration == null) {
-      throw new ParseException("Unable to parse Duration '" + value + "'", 0);
+      throw new ParseException("Unable to parse Duration '" + text + "'", 0);
     }
 
     return duration;

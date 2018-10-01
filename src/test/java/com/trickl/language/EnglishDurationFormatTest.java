@@ -10,6 +10,7 @@ public class EnglishDurationFormatTest {
 
   @Test
   public void testParse() throws ParseException {
+    Assert.assertEquals(Duration.ofHours(1), new EnglishDurationFormat().parse("hour"));
     Assert.assertEquals(Duration.ofHours(1), new EnglishDurationFormat().parse("1 hour"));
     Assert.assertEquals(Duration.ofHours(2), new EnglishDurationFormat().parse("2 hours"));
     Assert.assertEquals(
@@ -62,6 +63,10 @@ public class EnglishDurationFormatTest {
     Assert.assertEquals(
         Duration.ofMinutes(85),
         new EnglishDurationFormat().parse("85 mins."));
+    
+    // Larger durations
+    Assert.assertEquals(Duration.ofDays(1), new EnglishDurationFormat().parse("day"));
+    Assert.assertEquals(Duration.ofDays(1), new EnglishDurationFormat().parse("1 day"));
   }
 
   @Test
