@@ -8,7 +8,7 @@
 Natural Language Parsing For
 
  * Numbers (e.g. one thousand and four)
- * Currency Amount (e.g. $13 million)
+ * Currency Amounts (e.g. $13 million)
  * Temporal Durations (e.g. 1 day 3 hours 17 minutes 10 seconds)
 
 ### Prerequisites
