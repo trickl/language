@@ -5,11 +5,13 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/be4af1f4cc620e465849/test_coverage)](https://codeclimate.com/github/trickl/language/test_coverage)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A set of short utility functions for parsing common English language constructs. 
+Natural Language Parsing For
 
-Specifically - reading numbers, currency amounts and durations as English text and converting into a strongly typed class.
+ ### Numbers (e.g. one thousand and four)
+ ### Currency Amount (e.g. $13 million)
+ ### Temporal Durations (e.g. 1 day 3 hours 17 minutes 10 seconds)
 
-### Prerequisites
+## Prerequisites
 
 Requires Maven and a Java 8 compiler installed on your system.
 
@@ -17,7 +19,7 @@ Requires Maven and a Java 8 compiler installed on your system.
 
 See the Junit tests for usage
 
-### Installing
+## Installing
 
 To download the library into a folder called "language" run
 
@@ -30,23 +32,6 @@ To build the library run
 ```
 mvn clean build
 ```
-
-## Examples
-
-### Duration Parsing
-
-* "1 day 3 hours 17 minutes 10 seconds" -> java.time.Duration
-* "7 seconds 320 millis" -> java.time.Duration
-
-### Number Parsing
-
-* "two hundred sixty four" -> 264
-* "23 million, three hundred and 97" -> 23000397
-
-### Currency Amount Parsing
-
-* "$13 million" -> (USD, 13000000)
-* "one hundred british pound sterling" -> (GBP, 100)
 
 ## Acknowledgments
 
