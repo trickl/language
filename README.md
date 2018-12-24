@@ -5,7 +5,7 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/be4af1f4cc620e465849/test_coverage)](https://codeclimate.com/github/trickl/language/test_coverage)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Natural Language Parsing For
+Natural Language Parsing for -
 
  * Numbers (e.g. one thousand and four)
  * Currency Amounts (e.g. $13 million)
