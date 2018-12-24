@@ -7,19 +7,19 @@
 
 Natural Language Parsing For
 
- ### Numbers (e.g. one thousand and four)
- ### Currency Amount (e.g. $13 million)
- ### Temporal Durations (e.g. 1 day 3 hours 17 minutes 10 seconds)
+ * Numbers (e.g. one thousand and four)
+ * Currency Amount (e.g. $13 million)
+ * Temporal Durations (e.g. 1 day 3 hours 17 minutes 10 seconds)
 
-## Prerequisites
+### Prerequisites
 
 Requires Maven and a Java 8 compiler installed on your system.
 
-## Usage
+### Usage
 
 See the Junit tests for usage
 
-## Installing
+### Installing
 
 To download the library into a folder called "language" run
 
@@ -33,7 +33,7 @@ To build the library run
 mvn clean build
 ```
 
-## Acknowledgments
+### Acknowledgments
 
 * The number parsed was built with an inspiration from a blog post https://blog.cordiner.net/2010/01/02/parsing-english-numbers-with-perl/
 
