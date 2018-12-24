@@ -17,11 +17,11 @@ Requires Maven and a Java 8 compiler installed on your system.
 
 ### Usage
 
-See the Junit tests for usage
+See the Junit tests for usage and more examples.
 
 ### Installing
 
-To download the library into a folder called "language" run
+To download the library into a folder called "language" run -
 
 ```
 git clone https://github.com/trickl/language.git
