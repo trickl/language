@@ -30,8 +30,14 @@ public class EnglishCurrencyAmountFormat {
   private static final Set<String> ISO_3166 =
       new HashSet<>(Arrays.asList(Locale.getISOCountries()));
 
+  private static final List<Locale.LanguageRange> LOCALE_PRIORITY_LIST = 
+       Stream.concat(Locale.LanguageRange.parse("en-US;q=1.0,en-GB").stream(),
+       Arrays.asList(Locale.getAvailableLocales()).stream()
+       .map(locale -> new Locale.LanguageRange(locale.toLanguageTag())))
+       .collect(Collectors.toList());
+
   private static final List<Locale> LOCALES_ISO_3166 =
-      Arrays.asList(Locale.getAvailableLocales())
+      Locale.filter(LOCALE_PRIORITY_LIST, Arrays.asList(Locale.getAvailableLocales()))
           .stream()
           .filter(locale -> ISO_3166.contains(locale.getCountry()))
           .collect(Collectors.toList());

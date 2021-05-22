@@ -26,7 +26,7 @@ public class EnglishCurrencyAmountFormatTest {
     assertParsesCurrencyAmount("13 million euro", "EUR", 13000000L);
     assertParsesCurrencyAmount("13 million us dollar", "USD", 13000000L);
     assertParsesCurrencyAmount("200 US dollar", "USD", 200L);
-    assertParsesCurrencyAmount("one hundred british pound sterling", "GBP", 100L);
+    assertParsesCurrencyAmount("one hundred british pound", "GBP", 100L);
     assertParsesCurrencyAmount("₹420 million", "INR", 420000000L);
     
     // assertParsesCurrencyAmount("₹20 crore", "INR", 200000000);
